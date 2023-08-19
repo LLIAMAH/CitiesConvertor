@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34009.444
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitiesConvertor", "CitiesConvertor\CitiesConvertor.csproj", "{CE2FAD11-4664-4C43-864B-959A83C1395A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cities.DB", "Cities.DB\Cities.DB.csproj", "{E797C3D6-6193-4CF0-91CA-4E50A21D7C06}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CE2FAD11-4664-4C43-864B-959A83C1395A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE2FAD11-4664-4C43-864B-959A83C1395A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE2FAD11-4664-4C43-864B-959A83C1395A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE2FAD11-4664-4C43-864B-959A83C1395A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E797C3D6-6193-4CF0-91CA-4E50A21D7C06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E797C3D6-6193-4CF0-91CA-4E50A21D7C06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E797C3D6-6193-4CF0-91CA-4E50A21D7C06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E797C3D6-6193-4CF0-91CA-4E50A21D7C06}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3B6A0DAB-95D5-4C43-920E-46658AFBEDAD}
+	EndGlobalSection
+EndGlobal
