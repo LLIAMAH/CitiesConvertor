@@ -13,7 +13,5 @@ namespace Cities.DB.Entities
         [ForeignKey("Test1")]
         public long? Test1Id { get; set; }
         public virtual Test1? Test1 { get; set; }
-
-        public virtual ICollection<TestMany>? TestManies { get; set; }
     }
 }
