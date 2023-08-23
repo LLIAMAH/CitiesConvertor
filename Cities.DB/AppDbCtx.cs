@@ -5,8 +5,9 @@ namespace Cities.DB
 {
     public class AppDbCtx : DbContext
     {
-        public DbSet<Test> Tests { get; set; }
-        public DbSet<Test1> Tests1 { get; set; }
+        public DbSet<Country> Countries { get; set; }
+        public DbSet<City> Cities { get; set; }
+        public DbSet<CityType> CityTypes { get; set; }
 
         public AppDbCtx(DbContextOptions<AppDbCtx> options) : base(options) { }
     }

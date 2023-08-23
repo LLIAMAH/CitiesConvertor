@@ -25,12 +25,13 @@ using IHost host = Host.CreateDefaultBuilder(args)
 
 using (var ctx = host.Services.GetService<AppDbCtx>())
 {
-
-    ctx.Tests.Add(new Test() { Data = "Test" });
-    ctx.Tests.Add(new Test() { Data = "Test1" });
-    ctx.Tests.Add(new Test() { Data = "Test2" });
-    ctx.Tests.Add(new Test() { Data = "Test3" });
-    ctx.Tests.Add(new Test() { Data = "Test4" });
+    /*
+    ctx.Tests.Add(new Country() { Data = "Test" });
+    ctx.Tests.Add(new Country() { Data = "Test1" });
+    ctx.Tests.Add(new Country() { Data = "Test2" });
+    ctx.Tests.Add(new Country() { Data = "Test3" });
+    ctx.Tests.Add(new Country() { Data = "Test4" });
 
     ctx.SaveChanges();
+    */
 }
