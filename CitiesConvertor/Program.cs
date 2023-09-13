@@ -61,7 +61,7 @@ using (var reader = new StreamReader(FilePath))
 using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 {
     csv.Context.RegisterClassMap<RawDataItemMap>();
-    var records = csv.GetRecords<RawDataItem>();
+    var records = csv.GetRecords<RawDataItem>().ToList();
     var countries = records.Select(o=>new
     {
         Name = o.country,
@@ -98,7 +98,7 @@ using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                 AdminName = record.admin_name,
                 Population = ConvertToLong(record.population),
                 CountryId = ctx.Countries.First(o=>o.Name==record.country).Id,
-                CityTypeId = ctx.CityTypes.First(o=>o.Name == record.city).Id
+                CityTypeId = ctx.CityTypes.First(o=>o.Name == record.capital).Id
             });
         }
         await ctx.SaveChangesAsync();
