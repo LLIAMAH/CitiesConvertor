@@ -62,8 +62,47 @@ using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 {
     csv.Context.RegisterClassMap<RawDataItemMap>();
     var records = csv.GetRecords<RawDataItem>();
-    var countries = records.Select(o=>o.country).Distinct().ToList();
-    var capitals = records.Select(o=>o.capital).Distinct().ToList();
+    var countries = records.Select(o=>new
+    {
+        Name = o.country,
+        ISO2 = o.iso2,
+        ISO3 = o.iso3
+    }).Distinct().ToList();
+    var capitals = records.Select(o=> new 
+    {
+        Name = o.capital
+    }).Distinct().ToList();
+
+    using (var ctx = host.Services.GetService<AppDbCtx>())
+    {
+        foreach (var country in countries)  
+        {
+            ctx.Countries.Add( new Country() {Name =  country.Name, ISO2 = country.ISO2, ISO3 = country.ISO3} );
+        }
+        await ctx.SaveChangesAsync();
+
+        foreach (var capital in capitals)
+        {
+            ctx.CityTypes.Add(new CityType() { Name = capital.Name });
+        }
+        await ctx.SaveChangesAsync();
+
+        foreach (var record  in records)
+        {
+            ctx.Cities.Add(new City()
+            {
+                Name = record.city,
+                NameASCII = record.city_ascii,
+                Lat = ConvertToFloat(record.lat),
+                Lng = ConvertToFloat(record.lng),
+                AdminName = record.admin_name,
+                Population = ConvertToLong(record.population),
+                CountryId = ctx.Countries.First(o=>o.Name==record.country).Id,
+                CityTypeId = ctx.CityTypes.First(o=>o.Name == record.city).Id
+            });
+        }
+        await ctx.SaveChangesAsync();
+    }
     var t = records;
 }
 
@@ -91,10 +130,10 @@ int ConvertToInt (string data)
     int.TryParse(data, out converted);
     return converted;
 }
-double ConvertToDouble(string data)
+float ConvertToFloat(string data)
 {
-    double converted = 0;
-    double.TryParse(data, CultureInfo.InvariantCulture, out converted);
+    float converted = 0;
+    float.TryParse(data, CultureInfo.InvariantCulture, out converted);
     return converted;
 }
 long ConvertToLong(string data)
