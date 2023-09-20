@@ -8,8 +8,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 
 using IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration(cfg => { cfg.AddJsonFile("appsettings.json"); })
@@ -62,21 +64,26 @@ using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 {
     csv.Context.RegisterClassMap<RawDataItemMap>();
     var records = csv.GetRecords<RawDataItem>().ToList();
-    var countries = records.Select(o=>new
+    var countries = records.Select(o => new List<Country>
     {
         Name = o.country,
         ISO2 = o.iso2,
         ISO3 = o.iso3
     }).Distinct().ToList();
-    var capitals = records.Select(o=> new 
+    var capitals = records.Select(o => new 
     {
         Name = o.capital
     }).Distinct().ToList();
 
     using (var ctx = host.Services.GetService<AppDbCtx>())
     {
+        var bdcountries = ctx.Countries.ToDictionary(k => k.Name, v => v.Id);
+        var bdcitytypes = ctx.CityTypes.ToDictionary(k => k.Name, v => v.Id);
+        var missingcountries = GetMissingStCountries(bdcountries, countries);
+        var missingcitytypes = GetMissingStCapitals(bdcitytypes, capitals);
+
         foreach (var country in countries)  
-        {
+        {            
             ctx.Countries.Add( new Country() {Name =  country.Name, ISO2 = country.ISO2, ISO3 = country.ISO3} );
         }
         await ctx.SaveChangesAsync();
@@ -87,6 +94,9 @@ using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
         }
         await ctx.SaveChangesAsync();
 
+        //var bdcountries = ctx.Countries.ToList();
+        //var bdcitytypes = ctx.CityTypes.ToList();
+        
         foreach (var record  in records)
         {
             ctx.Cities.Add(new City()
@@ -97,8 +107,8 @@ using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                 Lng = ConvertToFloat(record.lng),
                 AdminName = record.admin_name,
                 Population = ConvertToLong(record.population),
-                CountryId = ctx.Countries.First(o=>o.Name==record.country).Id,
-                CityTypeId = ctx.CityTypes.First(o=>o.Name == record.capital).Id
+                CountryId = bdcountries[record.country], //First (o => o.Name == record.country).Id, //ctx.Countries.First(o=>o.Name==record.country).Id,
+                CityTypeId = bdcitytypes[record.capital]//First(o=> o.Name == record.capital).Id //ctx.CityTypes.First(o=>o.Name == record.capital).Id
             });
         }
         await ctx.SaveChangesAsync();
@@ -106,10 +116,19 @@ using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
     var t = records;
 }
 
+object GetMissingStCapitals(Dictionary<string, long> bdcitytypes, List<CityType> capitals)
+{
+    var result = capitals.Except(bdcitytypes);
+    return result;
+}
 
-
-
-
+List<Country> GetMissingStCountries(Dictionary<string, long> bdcountries, List<Country> countries)
+{
+    var result = countries.Except(bdcountries);
+    return result;
+    
+    //throw new NotImplementedException();
+}
 
 using (var ctx = host.Services.GetService<AppDbCtx>())
 {
@@ -142,3 +161,4 @@ long ConvertToLong(string data)
     long.TryParse(data, CultureInfo.InvariantCulture, out converted);
     return converted;
 }
+
