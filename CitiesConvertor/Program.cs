@@ -32,39 +32,40 @@ using IHost host = Host.CreateDefaultBuilder(args)
 
 var FilePath = "C:\\Users\\Squirrel\\Downloads\\simplemaps_worldcities_basicv1.76\\worldcities.csv";
 
-//using (StreamReader reader = new StreamReader(FilePath))
-//{
-//    string? line;
-//    while ((line = await reader.ReadLineAsync()) != null)
-//    {
-//        var split = line.Split(',');
-//        if (split.Length != 11)
-//        {
-//            throw new Exception("Размер рабитой строки не валиден!");
-//        }
-        
-//        var record = new RawDataItem()
-//        {
-//            city = split[0],
-//            city_ascii = split[1],
-//            lat = ConvertToDouble(split[2]),
-//            lng = ConvertToDouble(split[3]),
-//            country = split[4],
-//            iso2 = split[5],
-//            iso3 = split[6],
-//            admin_name = split[7],
-//            capital = split[8],
-//            population = ConvertToInt(split[9]),
-//            id = ConvertToLong(split[10])
-//        };
-//    }
-//}
+/*using (StreamReader reader = new StreamReader(FilePath))
+{
+    string? line;
+    while ((line = await reader.ReadLineAsync()) != null)
+    {
+        var split = line.Split(',');
+        if (split.Length != 11)
+        {
+            throw new Exception("Размер рабитой строки не валиден!");
+        }
+
+        var record = new RawDataItem()
+        {
+            city = split[0],
+            city_ascii = split[1],
+            lat = ConvertToDouble(split[2]),
+            lng = ConvertToDouble(split[3]),
+            country = split[4],
+            iso2 = split[5],
+            iso3 = split[6],
+            admin_name = split[7],
+            capital = split[8],
+            population = ConvertToInt(split[9]),
+            id = ConvertToLong(split[10])
+        };
+    }
+}
+*/
 using (var reader = new StreamReader(FilePath))
 using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 {
     csv.Context.RegisterClassMap<RawDataItemMap>();
     var records = csv.GetRecords<RawDataItem>().ToList();
-    var countries = records.Select(o => new List<Country>
+    var countries = records.Select(o => new Country
     {
         Name = o.country,
         ISO2 = o.iso2,
@@ -77,8 +78,10 @@ using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 
     using (var ctx = host.Services.GetService<AppDbCtx>())
     {
-        var bdcountries = ctx.Countries.ToDictionary(k => k.Name, v => v.Id);
-        var bdcitytypes = ctx.CityTypes.ToDictionary(k => k.Name, v => v.Id);
+        var bdcountries = ctx.Countries
+            .ToDictionary(k => k.Name, v => v.Id);
+        var bdcitytypes = ctx.CityTypes
+            .ToDictionary(k => k.Name, v => v.Id);
         var missingcountries = GetMissingStCountries(bdcountries, countries);
         var missingcitytypes = GetMissingStCapitals(bdcitytypes, capitals);
 
@@ -124,10 +127,18 @@ object GetMissingStCapitals(Dictionary<string, long> bdcitytypes, List<CityType>
 
 List<Country> GetMissingStCountries(Dictionary<string, long> bdcountries, List<Country> countries)
 {
-    var result = countries.Except(bdcountries);
+    var exceptData = countries.Select(o => o.Name)
+        .Except(bdcountries.Select(o => o.Key));
+
+    var dictionaryCountries = countries.ToDictionary(k => k.Name, v => v);
+
+    var result = new List<Country>();
+    foreach (var countryName in exceptData)
+        result.Add(dictionaryCountries[countryName]);
+
+    ///return exceptData.Select(countryName => dictionaryCountries[countryName]).ToList();
+
     return result;
-    
-    //throw new NotImplementedException();
 }
 
 using (var ctx = host.Services.GetService<AppDbCtx>())
@@ -161,4 +172,3 @@ long ConvertToLong(string data)
     long.TryParse(data, CultureInfo.InvariantCulture, out converted);
     return converted;
 }
-
