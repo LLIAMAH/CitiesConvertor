@@ -30,7 +30,18 @@ using IHost host = Host.CreateDefaultBuilder(args)
     })
     .Build();
 
-var FilePath = "C:\\Users\\Squirrel\\Downloads\\simplemaps_worldcities_basicv1.76\\worldcities.csv";
+//var FilePath = "C:\\Users\\Squirrel\\Downloads\\simplemaps_worldcities_basicv1.76\\worldcities.csv";
+
+var FilePath = "C:\\Users\\Squirrel\\simplemaps_worldcities_basicv1.76\\worldcities.csv";
+//bool fileExist = File.Exists(FilePath);
+/*
+while (!File.Exists(FilePath) || FilePath == "Exit" )//fileExist)
+{
+    Console.WriteLine("File does not exist. Please, indicate the correct path. Enter 'Exit' to close process");
+    FilePath = Console.ReadLine();
+    
+}
+*/
 
 /*using (StreamReader reader = new StreamReader(FilePath))
 {
@@ -60,6 +71,7 @@ var FilePath = "C:\\Users\\Squirrel\\Downloads\\simplemaps_worldcities_basicv1.7
     }
 }
 */
+
 using (var reader = new StreamReader(FilePath))
 using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 {
@@ -71,7 +83,7 @@ using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
         ISO2 = o.iso2,
         ISO3 = o.iso3
     }).Distinct().ToList();
-    var capitals = records.Select(o => new 
+    var capitals = records.Select(o => new CityType
     {
         Name = o.capital
     }).Distinct().ToList();
@@ -93,7 +105,8 @@ using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 
         foreach (var capital in capitals)
         {
-            ctx.CityTypes.Add(new CityType() { Name = capital.Name });
+            ctx.CityTypes.Add(new CityType() 
+            { Name = capital.Name });
         }
         await ctx.SaveChangesAsync();
 
@@ -119,9 +132,17 @@ using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
     var t = records;
 }
 
-object GetMissingStCapitals(Dictionary<string, long> bdcitytypes, List<CityType> capitals)
+List<CityType> GetMissingStCapitals(Dictionary<string, long> bdcitytypes, List<CityType> capitals)
 {
-    var result = capitals.Except(bdcitytypes);
+    var exceptData = capitals.Select(o => o.Name)
+      .Except(bdcitytypes.Select(o => o.Key));
+
+    var dictionaryCapitals = capitals.ToDictionary(k => k.Name, v => v);
+
+    var result = new List<CityType>();
+    foreach (var capitalName in exceptData)
+        result.Add(dictionaryCapitals[capitalName]);
+
     return result;
 }
 
