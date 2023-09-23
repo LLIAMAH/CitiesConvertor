@@ -9,9 +9,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 using IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration(cfg => { cfg.AddJsonFile("appsettings.json"); })
@@ -34,14 +36,19 @@ using IHost host = Host.CreateDefaultBuilder(args)
 
 var FilePath = "C:\\Users\\Squirrel\\simplemaps_worldcities_basicv1.76\\worldcities.csv";
 //bool fileExist = File.Exists(FilePath);
-/*
-while (!File.Exists(FilePath) || FilePath == "Exit" )//fileExist)
+
+// Version 1
+while (!File.Exists(FilePath))
 {
     Console.WriteLine("File does not exist. Please, indicate the correct path. Enter 'Exit' to close process");
     FilePath = Console.ReadLine();
-    
+
+    if (FilePath.Equals("Exit", StringComparison.OrdinalIgnoreCase))
+    {
+        Console.WriteLine("Process closed");
+        return;
+    }
 }
-*/
 
 /*using (StreamReader reader = new StreamReader(FilePath))
 {
