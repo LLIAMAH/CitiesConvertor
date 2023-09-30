@@ -32,9 +32,9 @@ using IHost host = Host.CreateDefaultBuilder(args)
     })
     .Build();
 
-//var FilePath = "C:\\Users\\Squirrel\\Downloads\\simplemaps_worldcities_basicv1.76\\worldcities.csv";
+var FilePath = "C:\\Users\\User\\Downloads\\simplemaps_worldcities_basicv1.76\\worldcities.csv";
 
-var FilePath = "C:\\Users\\Squirrel\\simplemaps_worldcities_basicv1.76\\worldcities.csv";
+//var FilePath = "C:\\Users\\Squirrel\\simplemaps_worldcities_basicv1.76\\worldcities.csv";
 //bool fileExist = File.Exists(FilePath);
 
 // Version 1

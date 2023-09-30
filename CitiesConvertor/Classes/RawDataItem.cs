@@ -1,16 +1,27 @@
-﻿using Cities.DB.Entities;
-using CitiesConvertor.Classes;
+﻿using CitiesConvertor.Classes;
 using CsvHelper.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CitiesConvertor.Classes
 {
-    public class RawDataItem
+    /*
+    public struct AAAAStruct // VALUABLE - значимый
+    {
+        public string Param { get; set; }
+
+        public string Param1 { get; set; }
+        public string Param2 { get; set; }
+
+        public static bool operator ==(AAAAStruct input1, AAAAStruct input2)
+        {
+            return input1.Param.Equals(input2.Param);
+        }
+        public static bool operator !=(AAAAStruct input1, AAAAStruct input2)
+        {
+            return !input1.Param.Equals(input2.Param);
+        }
+    }*/
+
+    public class RawDataItem // REFERENCED - внутри ссылка
     {
         public string city { get; set; }
         public string city_ascii { get; set; }
@@ -24,9 +35,29 @@ namespace CitiesConvertor.Classes
         public string population { get; set; }
         public string id { get; set; }
 
-    }
+        public override string ToString()
+        {
+            return $"{city}:{country}:{capital}";
+        }
 
+        public override bool Equals(object? obj)
+        {
+            if(obj == null) return false;
+            var converted = obj as RawDataItem;
+            if (converted == null) return false;
+
+            return this.city.Equals(converted.city) // false
+                   && this.country.Equals(converted.country) // true
+                   && this.capital.Equals(converted.capital); // true;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.city.GetHashCode() ^ this.country.GetHashCode();
+        }
+    }
 }
+
 public class RawDataItemMap : ClassMap<RawDataItem>
 {
     public RawDataItemMap()
